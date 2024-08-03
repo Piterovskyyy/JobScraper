@@ -10,7 +10,7 @@ using System.Threading.Tasks;
     {
         public interface IJobScraper
         {
-            Task<IEnumerable<TheProtocolJobOffer>> ScrapeJobOffersAsync();
+            Task<IEnumerable<JobOffer>> ScrapeJobOffersAsync();
         }
     }
 

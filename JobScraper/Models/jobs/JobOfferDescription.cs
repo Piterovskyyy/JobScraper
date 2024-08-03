@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JobScraper.Models.TheProtocol
 {
-    public class TheProtocolOfferDescription
+    public class JobOfferDescription
     {
         public List<string> Responsibilities { get; set; }
 

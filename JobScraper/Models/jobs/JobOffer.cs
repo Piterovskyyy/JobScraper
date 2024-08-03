@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace JobScraper.Models.TheProtocol
 {
-    public class TheProtocolJobOffer
+    public class JobOffer
     {
         public string Title { get; set; }
         public string CompanyName { get; set; }
@@ -17,7 +17,7 @@ namespace JobScraper.Models.TheProtocol
         public string OfferValidTo { get;set; }
         public string ComapnyImgUrl { get; set; }
         public string Location { get; set; }
-        public TheProtocolOfferDescription Description { get; set; }
+        public JobOfferDescription Description { get; set; }
         public string AboutCompany { get; set; }
         public string Url { get; set; }
     }

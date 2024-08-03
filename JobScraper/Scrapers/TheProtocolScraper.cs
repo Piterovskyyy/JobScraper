@@ -15,8 +15,8 @@ namespace JobScraper.Scrapers
     {
         private static readonly HttpClient _client = new HttpClient();
         private readonly string _url = "https://theprotocol.it/filtry/trainee,assistant,junior;p";
-        private int countOffers = 0;
-        private int pageNumber = 1;
+        private int _countOffers = 0;
+        private int _pageNumber = 1;
         private readonly HashSet<string> _visitedUrls = new HashSet<string>();
 
         static TheProtocolScraper()
@@ -26,9 +26,9 @@ namespace JobScraper.Scrapers
             _client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/xhtml+xml"));
         }
 
-        public async Task<IEnumerable<TheProtocolJobOffer>> ScrapeJobOffersAsync()
+        public async Task<IEnumerable<JobOffer>> ScrapeJobOffersAsync()
         {
-            var jobOffers = new List<TheProtocolJobOffer>();
+            var jobOffers = new List<JobOffer>();
             string currentUrl = _url;
 
             try
@@ -44,7 +44,7 @@ namespace JobScraper.Scrapers
                     var offerNodes = offersSection.SelectNodes(".//a[contains(@class, 'a4pzt2q')]");
                     if (offerNodes == null) break;
 
-                    var offerTasks = new List<Task<TheProtocolJobOffer>>();
+                    var offerTasks = new List<Task<JobOffer>>();
 
                     foreach (var offerNode in offerNodes)
                     {
@@ -65,10 +65,10 @@ namespace JobScraper.Scrapers
                     var offers = await Task.WhenAll(offerTasks);
                     jobOffers.AddRange(offers);
                      var nextPageNode = document.DocumentNode.SelectSingleNode("//a[@data-test='anchor-nextPage']");
-                     pageNumber++;
+                     _pageNumber++;
                    
                     currentUrl = nextPageNode != null
-                        ? new Uri(new Uri(_url), $"?pageNumber={pageNumber}").ToString()
+                        ? new Uri(new Uri(_url), $"?pageNumber={_pageNumber}").ToString()
                         : null;
                 }
             }
@@ -80,18 +80,18 @@ namespace JobScraper.Scrapers
             return jobOffers;
         }
 
-        private async Task<TheProtocolJobOffer> ProcessOfferAsync(string url)
+        private async Task<JobOffer> ProcessOfferAsync(string url)
         {
          
 
             var offerHtml = await GetHtmlAsync(url);
             var offerDocument = LoadHtml(offerHtml);
             var description = GetTheProtocolOfferDescription(offerDocument);
-            countOffers++;
-            Console.WriteLine($"Ilosc przetworznych ofert: {countOffers}");
+            _countOffers++;
+            Console.WriteLine($"Ilosc przetworznych ofert: {_countOffers}");
             Console.WriteLine($"Przetworzono ofertę: {offerDocument.DocumentNode.SelectSingleNode("//h1[@data-test='text-offerTitle']")?.InnerText.Trim()}");
 
-            return new TheProtocolJobOffer
+            return new JobOffer
             {
                 Title = offerDocument.DocumentNode.SelectSingleNode("//h1[@data-test='text-offerTitle']")?.InnerText.Trim() ?? "Brak danych",
                 CompanyName = offerDocument.DocumentNode.SelectSingleNode("//a[@data-test='anchor-company-link']")?.InnerText.Trim() ?? "Brak danych",
@@ -136,7 +136,7 @@ namespace JobScraper.Scrapers
             return string.Empty;
         }
 
-        private TheProtocolOfferDescription GetTheProtocolOfferDescription(HtmlDocument offerDocument)
+        private JobOfferDescription GetTheProtocolOfferDescription(HtmlDocument offerDocument)
         {
             var jobResponsibilities = ExtractList(offerDocument, "//div[@data-test='section-responsibilities']");
             var jobRequirements = ExtractList(offerDocument, "//div[@data-test='section-requirements']");
@@ -157,7 +157,7 @@ namespace JobScraper.Scrapers
                 }
             }
 
-            return new TheProtocolOfferDescription
+            return new JobOfferDescription
             {
                 Responsibilities = jobResponsibilities,
                 Requirements = jobRequirements,

@@ -15,7 +15,7 @@ namespace JobScraper.Services
             _scraper = scraper;
         }
 
-        public async Task<IEnumerable<TheProtocolJobOffer>> GetJobOffersAsync()
+        public async Task<IEnumerable<JobOffer>> GetJobOffersAsync()
         {
             return await _scraper.ScrapeJobOffersAsync();
         }
